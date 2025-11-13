@@ -6,9 +6,8 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Menu, ShoppingCart, CreditCard, Home } from "lucide-react";
+import { Menu, ShoppingCart, Wallet, Home } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 
@@ -21,25 +20,20 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur">
-      <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 mx-auto">
         {/* Logo Section */}
         <div className="flex items-center gap-6">
           <Link
             to="/"
-            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <CreditCard className="h-5 w-5" />
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br from-primary to-primary/60 shadow-lg shadow-primary/20">
+              <Wallet className="h-5 w-5 text-primary-foreground" />
             </div>
-            <div className="flex flex-col">
-              <span className="hidden font-bold text-lg sm:inline-block from-primary to-primary/60 bg-clip-text text-transparent">
-                EMI Store
-              </span>
-              <span className="hidden text-[10px] text-muted-foreground sm:inline-block">
-                Smart Shopping
-              </span>
-            </div>
+            <span className="font-bold text-xl bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              PayEasy
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -66,22 +60,6 @@ const Navbar = () => {
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
-          {/* Cart Badge */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="relative gap-2 hidden sm:flex dark:border-border/50 dark:hover:bg-accent/50"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="hidden md:inline">Cart</span>
-            <Badge
-              variant="destructive"
-              className="absolute -right-2 -top-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-            >
-              0
-            </Badge>
-          </Button>
-
           {/* Mode Toggle */}
           <ModeToggle />
 
@@ -102,20 +80,19 @@ const Navbar = () => {
               className="w-[280px] sm:w-[350px] dark:bg-background dark:border-border/50"
             >
               <div className="flex flex-col gap-4 pt-8">
-                <div className="flex items-center gap-2 px-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <CreditCard className="h-6 w-6" />
+                {/* Mobile Logo */}
+                <div className="flex items-center gap-3 px-2">
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-primary to-primary/60 shadow-lg shadow-primary/20">
+                    <Wallet className="h-6 w-6 text-primary-foreground" />
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-lg">EMI Store</span>
-                    <span className="text-xs text-muted-foreground">
-                      Smart Shopping
-                    </span>
-                  </div>
+                  <span className="font-bold text-xl bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                    PayEasy
+                  </span>
                 </div>
 
                 <Separator className="dark:bg-border/50" />
 
+                {/* Navigation Links */}
                 <div className="flex flex-col gap-2">
                   {navItems.map((item) => (
                     <Link
@@ -135,21 +112,6 @@ const Navbar = () => {
                 </div>
 
                 <Separator className="dark:bg-border/50" />
-
-                <Button
-                  variant="outline"
-                  className="w-full gap-2 justify-start relative dark:border-border/50"
-                  onClick={() => setOpen(false)}
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  View Cart
-                  <Badge
-                    variant="destructive"
-                    className="ml-auto h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-                  >
-                    0
-                  </Badge>
-                </Button>
               </div>
             </SheetContent>
           </Sheet>
