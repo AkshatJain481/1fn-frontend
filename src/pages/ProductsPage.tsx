@@ -24,14 +24,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Grid3X3,
-  LayoutGrid,
-  RefreshCcw,
-  Sparkles,
-  Tag,
-  XCircle,
-} from "lucide-react";
+import { Grid3X3, LayoutGrid, Sparkles, Tag, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "grid" | "compact";
@@ -43,17 +36,10 @@ const ProductsPage: React.FC = () => {
   >("relevance");
   const [view, setView] = useState<ViewMode>("grid");
 
-  const { data, isLoading, isError, error, refetch, isRefetching } =
-    useProducts({
-      staleTime: 60_000,
-      refetchOnWindowFocus: false,
-    });
-
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    data?.forEach((p) => set.add(p.category));
-    return ["all", ...Array.from(set).sort()];
-  }, [data]);
+  const { data, isLoading, isError, error } = useProducts({
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
   const filtered = useMemo(() => {
     let items = (data ?? []).slice();
@@ -112,18 +98,6 @@ const ProductsPage: React.FC = () => {
                   View Offers
                 </Button>
               </Link>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => refetch()}
-                disabled={isRefetching}
-              >
-                <RefreshCcw
-                  className={cn("h-4 w-4", isRefetching && "animate-spin")}
-                />
-                Refresh
-              </Button>
             </div>
           </div>
 
@@ -148,10 +122,7 @@ const ProductsPage: React.FC = () => {
                     : "₹0"
                 }
               />
-              <Stat
-                title="Categories"
-                value={(categories.length - 1).toString()}
-              />
+              <Stat title="Satisfied Customers" value={"10K+"} />
             </div>
           </div>
         </div>
@@ -240,25 +211,7 @@ const ProductsPage: React.FC = () => {
           ))}
         </div>
       )}
-
       <Separator className="my-8" />
-
-      {/* Discover section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Discover more</CardTitle>
-          <CardDescription>
-            Browse categories, compare devices, and find the best EMI plans.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <DiscoverTile title="Top Brands" to="/brands" />
-            <DiscoverTile title="Compare" to="/compare" />
-            <DiscoverTile title="EMI Plans" to="/emi-plans" />
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
@@ -307,17 +260,6 @@ const EmptyState = ({ onClear }: { onClear: () => void }) => (
       </Button>
     </CardContent>
   </Card>
-);
-
-const DiscoverTile = ({ title, to }: { title: string; to: string }) => (
-  <Link to={to}>
-    <Card className="group cursor-pointer transition hover:shadow-md">
-      <CardContent className="p-6">
-        <p className="text-base font-medium">{title}</p>
-        <p className="mt-1 text-sm text-muted-foreground">Explore</p>
-      </CardContent>
-    </Card>
-  </Link>
 );
 
 export default ProductsPage;
