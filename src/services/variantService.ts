@@ -73,3 +73,12 @@ export const createVariant = async (
     body: JSON.stringify(variantData),
   });
 };
+
+/**
+ * Delete a variant by ID
+ */
+export const deleteVariant = async (id: string): Promise<void> => {
+  return fetchAPI<void>(`variants/${id}`, {
+    method: "DELETE",
+  });
+};
