@@ -7,8 +7,8 @@ export interface Product {
   basePrice: number;
   mrp: number;
   images: string[];
-  variants: string[];
-  emiPlans: string[];
+  variants: Variant[];
+  emiPlans: EmiPlan[];
   inStock: boolean;
   specifications: Record<string, any>;
   slug: string;
