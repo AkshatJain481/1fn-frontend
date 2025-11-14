@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import { useProductBySlug } from "@/hooks/products";
 import { useVariantsByProductId } from "@/hooks/variants";
 import { useEmiPlansByProductId } from "@/hooks/emi-plans";
@@ -35,13 +35,15 @@ import {
   Calendar,
   Tag,
   Info,
+  CreditCard,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Variant } from "@/lib/interfaces";
+import type { Variant, EmiPlan } from "@/lib/interfaces";
 import { cn } from "@/lib/utils";
 
 const ProductDetailsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const {
     data: product,
     isLoading,
@@ -62,6 +64,7 @@ const ProductDetailsPage: React.FC = () => {
 
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  const [selectedEmiPlan, setSelectedEmiPlan] = useState<EmiPlan | null>(null);
 
   useEffect(() => {
     if (product?.images && product.images.length > 0) {
@@ -71,6 +74,18 @@ const ProductDetailsPage: React.FC = () => {
       setSelectedVariant(variants[0]);
     }
   }, [product, variants]);
+
+  const handleBuyNow = () => {
+    if (!selectedVariant || !selectedVariant.inStock) {
+      alert("Selected variant is out of stock.");
+      return;
+    }
+    navigate(
+      `/checkout/${product?.slug}?variantId=${selectedVariant._id}&emiPlanId=${
+        selectedEmiPlan?._id || ""
+      }`
+    );
+  };
 
   if (isLoading) {
     return <ProductDetailsSkeleton />;
@@ -229,7 +244,7 @@ const ProductDetailsPage: React.FC = () => {
                     key={idx}
                     variant="outline"
                     className={cn(
-                      "px-3 py-1 cursor-pointer",
+                      "px-3 py-1 cursor-pointer transition-all",
                       selectedVariant?._id === variant._id
                         ? "bg-primary text-primary-foreground border-primary"
                         : "hover:bg-muted hover:border-muted-foreground"
@@ -251,15 +266,53 @@ const ProductDetailsPage: React.FC = () => {
               <ShoppingCart className="h-5 w-5" />
               Add to Cart
             </Button>
+            <Button
+              size="lg"
+              variant="default"
+              className="gap-2"
+              disabled={!selectedVariant || !selectedVariant.inStock}
+              onClick={handleBuyNow}
+            >
+              <CreditCard className="h-5 w-5" />
+              {selectedEmiPlan ? "Buy Now with EMI" : "Buy Now"}
+            </Button>
             <Button variant="outline" size="lg" className="gap-2">
               <Heart className="h-5 w-5" />
-              Wishlist
             </Button>
             <Button variant="outline" size="lg" className="gap-2">
               <Share2 className="h-5 w-5" />
-              Share
             </Button>
           </div>
+
+          {/* Selected EMI Plan Display */}
+          {selectedEmiPlan && (
+            <Card className="border-primary/50 bg-primary/5">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold">Selected EMI Plan</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedEmiPlan.description}
+                    </p>
+                    <p className="text-lg font-bold">
+                      ₹{selectedEmiPlan.monthlyPayment.toLocaleString()}/month
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedEmiPlan.tenure} months •{" "}
+                      {selectedEmiPlan.interestRate}% interest
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedEmiPlan(null)}
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Additional Info */}
           <Card className="bg-muted/20 dark:bg-muted/10">
@@ -345,13 +398,26 @@ const ProductDetailsPage: React.FC = () => {
                 {emiPlans && emiPlans.length > 0 ? (
                   <div className="space-y-3">
                     {emiPlans.map((plan, idx) => (
-                      <Card key={idx} className="border-muted">
+                      <Card
+                        key={idx}
+                        className={cn(
+                          "border-2 transition-all cursor-pointer",
+                          selectedEmiPlan?._id === plan._id
+                            ? "border-primary bg-primary/5"
+                            : "border-muted hover:border-muted-foreground/50"
+                        )}
+                      >
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-base">
                               {plan.description}
                             </CardTitle>
-                            <Badge>{plan.tenure || "N/A"} months</Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge>{plan.tenure || "N/A"} months</Badge>
+                              {selectedEmiPlan?._id === plan._id && (
+                                <CheckCircle2 className="h-5 w-5 text-primary" />
+                              )}
+                            </div>
                           </div>
                         </CardHeader>
                         <CardContent className="text-sm text-muted-foreground">
@@ -381,11 +447,25 @@ const ProductDetailsPage: React.FC = () => {
                         </CardContent>
                         <CardFooter>
                           <Button
-                            variant="outline"
+                            variant={
+                              selectedEmiPlan?._id === plan._id
+                                ? "default"
+                                : "outline"
+                            }
                             size="sm"
                             className="w-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (plan === selectedEmiPlan) {
+                                setSelectedEmiPlan(null);
+                              } else {
+                                setSelectedEmiPlan(plan);
+                              }
+                            }}
                           >
-                            Select Plan
+                            {selectedEmiPlan?._id === plan._id
+                              ? "Selected"
+                              : "Select Plan"}
                           </Button>
                         </CardFooter>
                       </Card>

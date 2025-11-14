@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { lazy } from "react";
 import Layout from "./components/Layout";
+import CheckoutPage from "./pages/CheckoutPage";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ProductsPage = lazy(() => import("./pages/ProductsPage"));
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "products/:slug",
         element: <ProductDetailsPage />,
+      },
+      {
+        path: "checkout/:slug",
+        element: <CheckoutPage />,
       },
     ],
   },
