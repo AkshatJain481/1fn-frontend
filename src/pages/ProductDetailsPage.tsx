@@ -1,7 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router";
 import { useProductBySlug } from "@/hooks/products";
-import { useVariantsByProductId } from "@/hooks/variants";
-import { useEmiPlansByProductId } from "@/hooks/emi-plans";
 import {
   Card,
   CardContent,
@@ -54,14 +52,6 @@ const ProductDetailsPage: React.FC = () => {
     staleTime: 60_000,
   });
 
-  const { data: variants } = useVariantsByProductId(product?._id || "", {
-    enabled: !!product?._id,
-  });
-
-  const { data: emiPlans } = useEmiPlansByProductId(product?._id || "", {
-    enabled: !!product?._id,
-  });
-
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [selectedEmiPlan, setSelectedEmiPlan] = useState<EmiPlan | null>(null);
@@ -70,10 +60,10 @@ const ProductDetailsPage: React.FC = () => {
     if (product?.images && product.images.length > 0) {
       setSelectedImage(0);
     }
-    if (variants && variants.length > 0) {
-      setSelectedVariant(variants[0]);
+    if (product?.variants && product?.variants.length > 0) {
+      setSelectedVariant(product?.variants[0]);
     }
-  }, [product, variants]);
+  }, [product]);
 
   const handleBuyNow = () => {
     if (!selectedVariant || !selectedVariant.inStock) {
@@ -91,7 +81,7 @@ const ProductDetailsPage: React.FC = () => {
     return <ProductDetailsSkeleton />;
   }
 
-  if (isError || !product || !variants) {
+  if (isError || !product || !product?.variants) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12">
         <Alert variant="destructive">
@@ -233,13 +223,13 @@ const ProductDetailsPage: React.FC = () => {
           </div>
 
           {/* Variants */}
-          {variants && variants.length > 0 && (
+          {product?.variants && product?.variants.length > 0 && (
             <div>
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 Variants
               </h3>
               <div className="flex flex-wrap gap-2">
-                {variants.map((variant, idx) => (
+                {product.variants.map((variant, idx) => (
                   <Badge
                     key={idx}
                     variant="outline"
@@ -395,9 +385,9 @@ const ProductDetailsPage: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {emiPlans && emiPlans.length > 0 ? (
+                {product?.emiPlans && product?.emiPlans.length > 0 ? (
                   <div className="space-y-3">
-                    {emiPlans.map((plan, idx) => (
+                    {product.emiPlans.map((plan, idx) => (
                       <Card
                         key={idx}
                         className={cn(
